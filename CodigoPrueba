@@ -1,0 +1,73 @@
+import numpy as np
+
+# ===============================
+# Matriz inicial (NO dinámica)
+# ===============================
+A = np.array([(-2, 1, 1),
+              (1, -2, 1),
+              (1, 1, -2)])
+
+B = np.array([[150],
+              [200],
+              [150]])
+
+# ===============================
+# Función para calcular determinante
+# ===============================
+def Determinante(A):
+    determinante = np.linalg.det(A)
+    if determinante == 0.0:
+        return False
+    else:
+        return True
+
+# ===============================
+# Función para unir matrices A y B
+# ===============================
+def Unir(A, B):
+    unir = np.concatenate((A, B), axis=1)
+    AB = np.copy(unir)
+
+    tamanio = np.shape(unir)
+    n = tamanio[0]
+
+    for i in range(0, n - 1, 1):
+        columna = abs(AB[i:, i])
+        maximo = np.argmax(columna)
+
+        if (maximo != 0):
+            temporal = np.copy(AB[i, :])
+            AB[i, :] = AB[maximo + i, :]
+            AB[maximo + i, :] = temporal
+
+    return AB
+
+# ===============================
+# MAIN
+# ===============================
+print("Matriz A:")
+print(A)
+
+print("\nMatriz B:")
+print(B)
+
+print("\nDeterminante de A:", np.linalg.det(A))
+if Determinante(A):
+    print("La matriz A es invertible (det ≠ 0)")
+else:
+    print("La matriz A NO es invertible (det = 0)")
+
+print("\nMatriz aumentada [A|B]:")
+print(Unir(A, B))
+
+# Calcular inversa y solución
+if Determinante(A):
+    A_inv = np.linalg.inv(A)
+    print("\nInversa de A:")
+    print(A_inv)
+
+    X = np.dot(A_inv, B)
+    print("\nSolución del sistema AX = B:")
+    print(X)
+else:
+    print("La matriz A no es invertible, no se puede calcular la inversa ni resolver el sistema.")
