@@ -1,46 +1,27 @@
 import numpy as np
 
 # ===============================
-# Matriz inicial (NO dinámica)
+# Matriz A y vector B (3 nodos)
 # ===============================
-A = np.array([(-2, 1, 1),
-              (1, -2, 1),
-              (1, 1, -2)])
+A = np.array([[-2, 1, 1],
+              [1, -2, 1],
+              [1, 1, -2]])
 
 B = np.array([[150],
               [200],
               [150]])
 
 # ===============================
-# Función para calcular determinante
+# Función para verificar si A es invertible
 # ===============================
-def Determinante(A):
-    determinante = np.linalg.det(A)
-    if determinante == 0.0:
-        return False
-    else:
-        return True
+def es_invertible(A):
+    return np.linalg.det(A) != 0
 
 # ===============================
-# Función para unir matrices A y B
+# Función para unir matrices (para mostrar la aumentada)
 # ===============================
-def Unir(A, B):
-    unir = np.concatenate((A, B), axis=1)
-    AB = np.copy(unir)
-
-    tamanio = np.shape(unir)
-    n = tamanio[0]
-
-    for i in range(0, n - 1, 1):
-        columna = abs(AB[i:, i])
-        maximo = np.argmax(columna)
-
-        if (maximo != 0):
-            temporal = np.copy(AB[i, :])
-            AB[i, :] = AB[maximo + i, :]
-            AB[maximo + i, :] = temporal
-
-    return AB
+def unir_matrices(A, B):
+    return np.concatenate((A, B), axis=1)
 
 # ===============================
 # MAIN
@@ -48,26 +29,34 @@ def Unir(A, B):
 print("Matriz A:")
 print(A)
 
-print("\nMatriz B:")
+print("\nVector B:")
 print(B)
 
-print("\nDeterminante de A:", np.linalg.det(A))
-if Determinante(A):
-    print("La matriz A es invertible (det ≠ 0)")
-else:
-    print("La matriz A NO es invertible (det = 0)")
+# Determinante y verificación
+det = np.linalg.det(A)
+print("\nDeterminante de A:", det)
 
+# Matriz aumentada
+AB = unir_matrices(A, B)
 print("\nMatriz aumentada [A|B]:")
-print(Unir(A, B))
+print(AB)
 
-# Calcular inversa y solución
-if Determinante(A):
+# Resolver el sistema
+if es_invertible(A):
+    print("\nLa matriz A es invertible.")
     A_inv = np.linalg.inv(A)
     print("\nInversa de A:")
     print(A_inv)
 
     X = np.dot(A_inv, B)
-    print("\nSolución del sistema AX = B:")
+    print("\nSolución del sistema AX = B usando la inversa:")
     print(X)
 else:
-    print("La matriz A no es invertible, no se puede calcular la inversa ni resolver el sistema.")
+    print("\nLa matriz A NO es invertible.")
+    print("Se usará mínimos cuadrados para aproximar la solución.")
+    X, residuals, rank, s = np.linalg.lstsq(A, B, rcond=None)
+    print("\nSolución del sistema AX = B (mínimos cuadrados):")
+    print(X)
+    if residuals.size > 0:
+        print("Residuo:", residuals)
+
